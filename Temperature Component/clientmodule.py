@@ -1,6 +1,5 @@
 # echo_client.py
 import socket
-import os
 import time
 import fcntl as filelock
 
@@ -8,6 +7,8 @@ print("CLIENT WILL ATTEMPT TO INITIATE CONNECTION TO THE SERVER")
 #variables
 host = '10.69.79.139'
 port = 12345
+
+#constants
 BUFFER_SIZE = 1024
 FILENAME = "processeddata.log"
 
@@ -49,11 +50,11 @@ def transmit_data():
                   clientsocket.sendall(data.encode('utf-8'))
                   print('data sent successfully')
                else:
-                  print("could not read file??")
+                  print("could not read file??") #adda prooper error message
                   
                time.sleep(30)
    except Exception as e:
-            print(f"an error occured durinfg transmission: {e}")        
+            print(f"an error occured during transmission: {e}")        
 
 def main():
    transmit_data()

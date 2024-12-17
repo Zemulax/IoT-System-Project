@@ -4,29 +4,42 @@ import fcntl as filelock
 import threading
 import subprocess
 
-
+#constants
 THRESHOLD = 2
 RAW_TEMP_DATA_FILE = "temperaturelog"
 PROCESSED_TEMP_DATA_FILE = "processeddata.log"
 
 
-#initiate the sensor
 def call_sensormodule():
+    """calls the sensor as a subprocess
+    """
     subprocess.call(["python3", "sensormodule.py"])
     
 def call_clientmodule():
+    """calls clientmodule as a subprocess
+    """
     subprocess.call(["python3", "clientmodule.py"])
 
-#read the temperatue file
+
 def read_raw_temp_data(filename):
+    """reads temperature data from the temperature log file
+       uses locking mechanism
+       extracts the temperature value from the reading
+
+    Args:
+        filename (string): the file to read data from
+
+    Returns:
+        _float_: temperature value in float
+    """
     while True:
         try:
             with open(filename, "r") as file:
-                filelock.flock(file, filelock.LOCK_SH)
+                filelock.flock(file, filelock.LOCK_SH) #lock the file
                 
                 lines = file.readlines()
                 
-                filelock.flock(file, filelock.LOCK_UN)
+                filelock.flock(file, filelock.LOCK_UN) #unlock the file
             
             if lines:
                 for line in reversed(lines):
@@ -40,14 +53,42 @@ def read_raw_temp_data(filename):
 
 
 def log_trend_analysis(filename, trend_detection, temperatures):
+    """
+
+    Args:
+        filename (string): name of the file to write trends to
+        trend_detection (bool): dichotomy of trends
+        temperatures (list): list of data thats creating a negative trend
+    """
     with open(filename, 'a') as file:
         if trend_detection:
             file.writelines(f"Trend detected: All temmperatures below {THRESHOLD} in the last 30 seconds.\n")
             file.writelines(f"Temperatures detected: {temperatures}\n\n")
             file.flush()
 
-#data processing
+
+def trend_analysis(threshold, temperatures):
+    """Analyses temperature data to detect downward trends
+
+    Args:
+        threshold (int): a value that determines the threshold
+        temperatures (list): list of temperatures
+    """
+    
+    if temperatures and all(temp < threshold for temp in temperatures):
+        triggerActuator(True)
+        log_trend_analysis(PROCESSED_TEMP_DATA_FILE, True, temperatures)
+    else:
+        print(f"Everything is fine")
+        triggerActuator(False)
+    
+    
+    
 def process_temperature():
+    """initiates temperature data collection over a specified period of time
+       analyses temperature data to detect negative threshold trends.
+       if trends are detected they are recored
+    """
     while True:
         all_temperatures = []
         
@@ -57,18 +98,17 @@ def process_temperature():
             if temperature is not None:
                 all_temperatures.append(temperature)
             time.sleep(3) #query the data every 3 seconds
-        
-
-        if all_temperatures and all(temp < THRESHOLD for temp in all_temperatures):
-            triggerActuator(True)
-            log_trend_analysis(PROCESSED_TEMP_DATA_FILE, True, all_temperatures)
-        else:
-            print(f"Everything is fine")
-            triggerActuator(False)
+            
+        #process temperature data once collection done
+        trend_analysis(THRESHOLD, all_temperatures)
             
             
-
+#awaiting full implementation
 def triggerActuator(value):
+    """triggers an actuator as a response to trend analysis
+    Args:
+        value (_type_): _description_
+    """
     if(value):
         print("Actuactor must be functional now")
     else:
@@ -76,10 +116,12 @@ def triggerActuator(value):
 
 
 def main():
-    sesnorthread = threading.Thread(target=call_sensormodule)
+    """calls all functions
+    """
+    sensorthread = threading.Thread(target=call_sensormodule)
     clientthread = threading.Thread(target=call_clientmodule)
     try:
-         sesnorthread.start()
+         sensorthread.start()
          clientthread.start()
     except:
         print("failed to start sensor or client")

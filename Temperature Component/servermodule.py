@@ -5,6 +5,11 @@ host = '10.69.79.139'
 port = 12345
 
 def server():
+    """opens up connection to clients
+
+    Returns:
+        string: file contents received from client
+    """
     print("server initiated")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serversocket:
         serversocket.bind((host, port))
@@ -28,6 +33,8 @@ def server():
     return data
 
 def record_client_report():
+    """records the data received from client
+    """
     with open("client_reported", 'w') as file:
         x = server()
         file.write(x)

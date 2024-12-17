@@ -1,6 +1,6 @@
 #libraries
-import board
-import adafruit_dht
+import board # type: ignore
+import adafruit_dht # type: ignore
 import time
 import fcntl as filelock
 
@@ -19,16 +19,27 @@ line_number = 2
 #write the values to an external file
     
 def errorLogger(error):
+    """
+    handles error reporting graciously
+
+    Args:
+        error (string): the error that occured
+    """
     with open("temperaturelog", 'w') as file:
         file.truncate()
         file.write(error)
         file.flush()
 
+
 def read_temperature():
+    """
+    Reads temperature values from the sensor.
+    writes them to an external file using lock mechanism
+    
+    """
     with open(FILENAME, 'w+') as file:
         
         lines = file.readlines() #read file lines
-        
         if not lines:
             lines.append(HEADER)
             
@@ -39,6 +50,7 @@ def read_temperature():
                         #assign temp reading to variables
                         temperature_c = dhtSensor.temperature
                         
+                        #overwite the temperature log
                         if len(lines) >= line_number:
                             lines [line_number-1] = f"Temperature: {temperature_c:.1f} °C\n"
                         else:
@@ -50,10 +62,9 @@ def read_temperature():
                         file.truncate() #delete rest of the file
                         file.flush() #flush the buffer
                         time.sleep(40.0)
-                        
                 
                 except  RuntimeError as error:
-                        errorLogger("awaiting Sensor...")
+                        errorLogger(f"awaiting Sensor...{error}")
                         time.sleep(30)
                         continue
                 
@@ -66,11 +77,8 @@ def read_temperature():
                         errorLogger("Halted. Connect the sensor and Restart the program")
                         time.sleep(20)
                         quit()
-                                
-        
         dhtSensor.exit()
     
-
 def main():
     read_temperature()
     

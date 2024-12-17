@@ -1,0 +1,37 @@
+Sensor => continously record data
+       => write to temprecordings file
+
+client => read temprecordings file
+       => process the data
+           -> aggregate average temperature over a period of 1 minute
+       => assign labels 
+          -> if average > x : high temperature
+             --> this is normal
+          -> if average < x : low temperature
+             --> this is abnormal; trigger the actuator
+       => write labels to tempreport file
+           send tempreport file to the server if label abnormal
+
+Server => read the tempreport file 
+       => display on dashboard
+       => further escalation
+
+
+
+
+here is what I got:
+
+clientModule
+=> calls SensorModule to run
+=> reads temperaure log file
+   -> gathers data every 30 seconds
+   -> analyses data to to check for trend below threthold
+   -> logs processed trends to an external file
+
+SensorModule
+=> logs temperature data to an external file
+
+
+Client-ServerModule
+=>establishes link to the server
+=>transmits processed data to the server

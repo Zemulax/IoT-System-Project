@@ -35,3 +35,8 @@ SensorModule
 Client-ServerModule
 =>establishes link to the server
 =>transmits processed data to the server
+
+for temp sensor
+Yellow is power => 5v preferred
+blue is ground => any
+green is data transmission => logical pin 4

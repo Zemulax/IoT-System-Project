@@ -4,6 +4,7 @@ import fcntl as filelock
 import threading
 import subprocess
 
+from ledmodule import start_warning_thread
 #constants
 THRESHOLD = 2
 RAW_TEMP_DATA_FILE = "temperaturelog"
@@ -20,6 +21,10 @@ def call_clientmodule():
     """
     subprocess.call(["python3", "clientmodule.py"])
 
+def call_ledmodule():
+    """well do something
+    """
+    subprocess.call(["python3", "ledmodule.py"])
 
 def read_raw_temp_data(filename):
     """reads temperature data from the temperature log file
@@ -109,10 +114,7 @@ def triggerActuator(value):
     Args:
         value (_type_): _description_
     """
-    if(value):
-        print("Actuactor must be functional now")
-    else:
-        print("Actuator is off")
+    start_warning_thread(value)
 
 
 def main():

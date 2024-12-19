@@ -5,10 +5,11 @@ import threading
 import subprocess
 
 from ledmodule import start_warning_thread
+
 #constants
-THRESHOLD = 2
+THRESHOLD = 200
 RAW_TEMP_DATA_FILE = "temperaturelog"
-PROCESSED_TEMP_DATA_FILE = "processeddata.log"
+
 
 
 def call_sensormodule():
@@ -22,7 +23,7 @@ def call_clientmodule():
     subprocess.call(["python3", "clientmodule.py"])
 
 def call_ledmodule():
-    """well do something
+    """calls led module
     """
     subprocess.call(["python3", "ledmodule.py"])
 
@@ -57,7 +58,7 @@ def read_raw_temp_data(filename):
             quit()
 
 
-def log_trend_analysis(filename, trend_detection, temperatures):
+def log_trend_analysis( trend_detection, temperatures):
     """
 
     Args:
@@ -65,7 +66,7 @@ def log_trend_analysis(filename, trend_detection, temperatures):
         trend_detection (bool): dichotomy of trends
         temperatures (list): list of data thats creating a negative trend
     """
-    with open(filename, 'a') as file:
+    with open("processeddata.log", 'a') as file:
         if trend_detection:
             file.writelines(f"Trend detected: All temmperatures below {THRESHOLD} in the last 30 seconds.\n")
             file.writelines(f"Temperatures detected: {temperatures}\n\n")
@@ -81,11 +82,10 @@ def trend_analysis(threshold, temperatures):
     """
     
     if temperatures and all(temp < threshold for temp in temperatures):
-        triggerActuator(True)
-        log_trend_analysis(PROCESSED_TEMP_DATA_FILE, True, temperatures)
+        log_trend_analysis(True, temperatures)
+        start_warning_thread(True)
     else:
-        print(f"Everything is fine")
-        triggerActuator(False)
+        start_warning_thread(False)
     
     
     

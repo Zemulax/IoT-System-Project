@@ -24,7 +24,8 @@ def client(filename):
             return data
             
       except :
-         print("unable to read file??")
+         print("\nawating data from client\n")
+         time.sleep(30)
 
 def transmit_data():
    """_summary_
@@ -50,9 +51,9 @@ def transmit_data():
                   clientsocket.sendall(data.encode('utf-8'))
                   print('data sent successfully')
                else:
-                  print("could not read file??") #adda prooper error message
+                  print("could not read file data") #adda prooper error message
+                  time.sleep(30)
                   
-               time.sleep(30)
    except Exception as e:
             print(f"an error occured during transmission: {e}")        
 

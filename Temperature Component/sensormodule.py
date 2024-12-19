@@ -5,7 +5,7 @@ import time
 import fcntl as filelock
 
 
-print("SENSOR INITIATED")
+print("\nSENSOR INITIATED\n")
 #constants
 FILENAME = "temperaturelog"
 PIN_NUMBER = board.D4

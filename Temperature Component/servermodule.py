@@ -1,5 +1,6 @@
 
 import socket
+import time
 
 host = '10.69.79.139'
 port = 12345
@@ -29,7 +30,8 @@ def server():
                 if data:
                     print(f"Received data: {data}")
                 else:
-                    print("failed to receive data")
+                    print("\nfailed to receive data\n")
+                    time.sleep(30)
     return data
 
 def record_client_report():

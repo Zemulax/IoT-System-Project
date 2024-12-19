@@ -1,4 +1,4 @@
-import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO # type: ignore
 import time
 import threading
 
@@ -8,9 +8,11 @@ LED_PINB = 16
 
 
 
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_PIN, GPIO.OUT)
 GPIO.setup(LED_PINB, GPIO.OUT)
+
 
 def temp_threshold_warning(threshold_exceeded):
     """triggers actuator in response to edge module data analysis

@@ -52,7 +52,7 @@ def transmit_data():
                   print('data sent successfully')
                else:
                   print("could not read file data") #adda prooper error message
-                  time.sleep(30)
+               time.sleep(30)
                   
    except Exception as e:
             print(f"an error occured during transmission: {e}")        

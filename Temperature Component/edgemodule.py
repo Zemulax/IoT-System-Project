@@ -1,4 +1,3 @@
-import socket
 import time
 import fcntl as filelock
 import threading
@@ -8,9 +7,9 @@ from ledmodule import start_warning_thread, update_threshold
 
 #constants
 LOCAL_THRESHOLD = 0
-RAW_TEMP_DATA_FILE = "temperaturelog"
-THRESH_FILENAME = "threshold.log"
-
+RAW_TEMP_DATA_FILE = "./datalogs/rawtemperaturedata.log"
+THRESH_FILENAME = "./datalogs/thresholdconfiguration.log"
+PROCESSED_DATA_FILE = "./datalogs/processedtemperaturedata.log"
 
 def get_threshold(filename):
     """read the threshold setting from the file
@@ -22,8 +21,11 @@ def get_threshold(filename):
         float: the new threshold value
     """
     try:
+        
         with open (filename, 'r') as file:
+            filelock.flock(file, filelock.LOCK_SH)
             threshold = file.read().strip()
+            filelock.flock(file, filelock.LOCK_UN)
             if (threshold != None):
                 return float(threshold)
     except FileNotFoundError:
@@ -86,11 +88,14 @@ def log_trend_analysis( trend_detection, temperatures):
         trend_detection (bool): dichotomy of trends
         temperatures (list): list of data thats creating a negative trend
     """
-    with open("processeddata.log", 'w') as file:
+    with open(PROCESSED_DATA_FILE, 'w') as file:
         if trend_detection:
+            filelock.flock(file, filelock.LOCK_EX)
             file.write(f"Trend detected: All temmperatures below THRESHOLD in the last 30 seconds.\n")
             file.write(f"Temperatures detected: {temperatures}\n\n")
             file.flush()
+            filelock.flock(file, filelock.LOCK_UN)
+            
 
 
 def trend_analysis(threshold, temperatures):
@@ -109,6 +114,7 @@ def trend_analysis(threshold, temperatures):
         update_threshold(True)
     else:
         update_threshold(False)
+        print("no trends detected")
     
     
     

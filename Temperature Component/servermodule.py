@@ -7,6 +7,7 @@ import threading
 
 host = '10.69.79.139'
 port = 12345
+CLIENT_DATA = "./datalogs/client_data_report.log"
 
 def server():
     """opens up connection to clients
@@ -37,7 +38,9 @@ def server():
                 #receive the file
                 data = connection.recv(data_size).decode('utf-8')
                 
-    return data
+                with open(CLIENT_DATA, 'a') as file:
+                    file.writelines(data)
+                    file.flush()
 
 def send_commands(connection):
     """sends a command to the client
@@ -67,12 +70,10 @@ def send_commands(connection):
 def record_client_report():
     """records the data received from client
     """
-    with open("client_reported", 'w') as file:
-        x = server()
-        file.write(x)
+    
 
 def main():
-    record_client_report()
+    server()
 
 if __name__ == '__main__':
     main()

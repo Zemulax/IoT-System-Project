@@ -7,7 +7,7 @@ import fcntl as filelock
 print
 print("\n===================SENSOR INITIATED=================\n")
 #constants
-FILENAME = "temperaturelog"
+FILENAME = "./datalogs/rawtemperaturedata.log"
 PIN_NUMBER = board.D4
 HEADER = "Temperature Recordings\n\n"
 

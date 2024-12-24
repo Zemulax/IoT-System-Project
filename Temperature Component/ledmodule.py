@@ -25,13 +25,14 @@ def temp_threshold_warning():
             if threshold_exceeded.is_set():
                 GPIO.output(LED_PIN, GPIO.HIGH)
                 time.sleep(3)
-                
+                GPIO.output(LED_PINB, GPIO.LOW)
                 GPIO.output(LED_PIN, GPIO.LOW)
                 time.sleep(3)
             else:
                 #turn green LED on
                 GPIO.output(LED_PINB, GPIO.HIGH)
     except KeyboardInterrupt:
+           GPIO.output(LED_PIN, GPIO.LOW)
            GPIO.cleanup()
 
 def start_warning_thread():

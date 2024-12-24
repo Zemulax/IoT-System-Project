@@ -4,14 +4,34 @@ import fcntl as filelock
 import threading
 import subprocess
 
-from ledmodule import start_warning_thread
+from ledmodule import start_warning_thread, update_threshold
 
 #constants
-THRESHOLD = 200
+LOCAL_THRESHOLD = 0
 RAW_TEMP_DATA_FILE = "temperaturelog"
+THRESH_FILENAME = "threshold.log"
 
 
+def get_threshold(filename):
+    """read the threshold setting from the file
 
+    Args:
+        filename (string): name of the file to read the data from
+
+    Returns:
+        float: the new threshold value
+    """
+    try:
+        with open (filename, 'r') as file:
+            threshold = file.read().strip()
+            if (threshold != None):
+                return float(threshold)
+    except FileNotFoundError:
+        return None
+    except ValueError:
+        print("Error unable to convert value to float")
+        return None
+    
 def call_sensormodule():
     """calls the sensor as a subprocess
     """
@@ -66,10 +86,10 @@ def log_trend_analysis( trend_detection, temperatures):
         trend_detection (bool): dichotomy of trends
         temperatures (list): list of data thats creating a negative trend
     """
-    with open("processeddata.log", 'a') as file:
+    with open("processeddata.log", 'w') as file:
         if trend_detection:
-            file.writelines(f"Trend detected: All temmperatures below {THRESHOLD} in the last 30 seconds.\n")
-            file.writelines(f"Temperatures detected: {temperatures}\n\n")
+            file.write(f"Trend detected: All temmperatures below THRESHOLD in the last 30 seconds.\n")
+            file.write(f"Temperatures detected: {temperatures}\n\n")
             file.flush()
 
 
@@ -80,12 +100,15 @@ def trend_analysis(threshold, temperatures):
         threshold (int): a value that determines the threshold
         temperatures (list): list of temperatures
     """
+    print("current thrsh", threshold)
+    start_warning_thread()
     
     if temperatures and all(temp < threshold for temp in temperatures):
         log_trend_analysis(True, temperatures)
-        start_warning_thread(True)
+        
+        update_threshold(True)
     else:
-        start_warning_thread(False)
+        update_threshold(False)
     
     
     
@@ -103,18 +126,13 @@ def process_temperature():
             if temperature is not None:
                 all_temperatures.append(temperature)
             time.sleep(3) #query the data every 3 seconds
-            
-        #process temperature data once collection done
-        trend_analysis(THRESHOLD, all_temperatures)
-            
-            
-#awaiting full implementation
-def triggerActuator(value):
-    """triggers an actuator as a response to trend analysis
-    Args:
-        value (_type_): _description_
-    """
-    start_warning_thread(value)
+        
+        adjusted_thresh = get_threshold(THRESH_FILENAME)
+        
+        if adjusted_thresh:
+            trend_analysis(adjusted_thresh, all_temperatures)
+        else:
+            trend_analysis(LOCAL_THRESHOLD, all_temperatures)
 
 
 def main():

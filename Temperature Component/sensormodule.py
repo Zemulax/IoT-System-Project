@@ -4,8 +4,8 @@ import adafruit_dht # type: ignore
 import time
 import fcntl as filelock
 
-
-print("\nSENSOR INITIATED\n")
+print
+print("\n===================SENSOR INITIATED=================\n")
 #constants
 FILENAME = "temperaturelog"
 PIN_NUMBER = board.D4

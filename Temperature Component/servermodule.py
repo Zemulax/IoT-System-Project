@@ -4,10 +4,15 @@ import sys
 import time
 import select
 import threading
+import os
 
 host = '10.69.79.139'
 port = 12345
-CLIENT_DATA = "./datalogs/client_data_report.log"
+FOLDER = "datalogs"
+CLIENT_DATA_FILE = os.path.join(FOLDER, "client_data_report.log")
+
+if not os.path.exists(FOLDER):
+    os.makedirs(FOLDER) 
 
 def server():
     """opens up connection to clients
@@ -15,15 +20,15 @@ def server():
     Returns:
         string: file contents received from client
     """
-    print("server initiated")
+    print("Server initiated")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as serversocket:
         serversocket.bind((host, port))
         serversocket.listen(5)
-        print("server is listening for connections")
+        print("\nServer is listening for connections...\n")
         
         
         connection, address = serversocket.accept()
-        print(f"connection established through{address}")
+        print(f"connection established through{address}\n")
         
         with connection:
             command_thread = threading.Thread(target=send_commands, args=(connection,)) #command thread
@@ -38,10 +43,11 @@ def server():
                 #receive the file
                 data = connection.recv(data_size).decode('utf-8')
                 
-                with open(CLIENT_DATA, 'a') as file:
+                with open(CLIENT_DATA_FILE, 'a') as file:
                     file.writelines(data)
                     file.flush()
 
+#AI*
 def send_commands(connection):
     """sends a command to the client
 
@@ -56,21 +62,15 @@ def send_commands(connection):
             user_input = sys.stdin.read(1)
             if user_input == "t":
                 try:
-                    new_threshold = input("Enter new threshold: ").strip()
+                    new_threshold = input("Enter new threshold value: ").strip()
                     if new_threshold.isdigit():
                         threshold_value = str(new_threshold)
                         connection.sendall(threshold_value.encode('utf-8'))
                         time.sleep(30)
                     else:
-                        print("please enter a number less than 40")
+                        print("\nPlease enter a number less than 40\n")
                 except Exception as e:
-                    print(f"error while setting threshold: {e}")
-    
-
-def record_client_report():
-    """records the data received from client
-    """
-    
+                    print(f"\nThere was an error while setting threshold. please try again: {e}\n")
 
 def main():
     server()

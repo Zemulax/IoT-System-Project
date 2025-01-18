@@ -53,11 +53,10 @@ def transmit_data():
    """_summary_
       send file contents to the server
    """
-   print("Attempting data transmission to the server")
    try:
       with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientsocket:
          clientsocket.connect((host, port))
-         print("server connected")
+         print("\nserver connection established\n")
          
          while True:
             start_time = time.time()
@@ -65,15 +64,15 @@ def transmit_data():
                data = client(PROCESSED_DATA_FILE)
                
                if data:
-                  print("transmitting data")
+                  print("\nTransmitting data to the server...\n")
                   #send data length
                   clientsocket.sendall(len(data).to_bytes(4, byteorder='big'))
                   
                   #send the file data#
                   clientsocket.sendall(data.encode('utf-8'))
-                  print('data sent successfully')
+                  print('\nData sent successfully\n')
                else:
-                  print("could not read file data") #adda prooper error message
+                  print("\nCould not read file data\n") #adda prooper error message
                   
                try:
                      new_thresh = clientsocket.recv(2).decode('utf-8')
@@ -83,7 +82,7 @@ def transmit_data():
                #time.sleep(30)
                   
    except Exception as e:
-            print(f"an error occured during transmission: {e}")   
+            print(f"\nan error occured during transmission: {e}\n")   
 
 
    

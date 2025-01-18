@@ -46,6 +46,7 @@ def start_warning_thread():
     thread.start()
     
 
+#AI*
 def update_threshold(state):
     """updates the thread
 

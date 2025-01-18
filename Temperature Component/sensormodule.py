@@ -20,12 +20,12 @@ line_number = 2
     
 def errorLogger(error):
     """
-    handles error reporting graciously
+    error reporting
 
     Args:
         error (string): the error that occured
     """
-    with open("temperaturelog", 'w') as file:
+    with open("Error.log", 'w') as file:
         file.truncate()
         file.write(error)
         file.flush()
@@ -69,7 +69,7 @@ def read_temperature():
                         continue
                 
                 except  TypeError:
-                        file.write("Unable tyo read from sensor")
+                        file.write("Unable to read from sensor")
                         time.sleep(10)
                         continue
                 
